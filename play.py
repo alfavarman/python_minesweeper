@@ -13,7 +13,7 @@ class Board:
         self.dug = set()
 
     def _create_board(self):
-        board = [[" " for _ in range(self.columns)] for _ in range(self.rows)]
+        board = [[None for _ in range(self.columns)] for _ in range(self.rows)]
         return board
 
     def plant_mines(self):
@@ -100,12 +100,24 @@ class Board:
 
         return True
 
+    def player_board_view(self):
+        visible_board = [[None for _ in range(self.columns)] for _ in range(self.rows)]
+        for r in range(self.rows):
+            for c in range(self.columns):
+                if (r, c) in self.dug:
+                    visible_board[r][c] = str(self.board[r][c])
+                else:
+                    visible_board[r][c] = ' '
+        for row in visible_board:
+            print(row)
+
 
 
 board = Board(10, 10, 10)
 board.plant_mines()
 board.assign_nearbly_mines_count()
 board.show_board()
+print(board.player_board_view())
 
 
 def play(rows: int, columns: int, mines: int):
@@ -114,7 +126,11 @@ def play(rows: int, columns: int, mines: int):
     board.plant_mines()
     board.assign_nearbly_mines_count()
 
-    move = input(map)
+    # while len(board.dug) is less than (board.rows *board.columns)-board.mines:
+    while len(board.dug) > (board.rows * board.columns)-board.mines:
+        print(board.player_board_view())
+
+    x, y = map(int, input(f'Where would You like to dig? input row, column as ex.: 2,3\n available rows: {rows}, columns {columns}'))
 # map input from player || loop until
 #     a) validate input to be correct
 #     b) check if input is a boom = game over
