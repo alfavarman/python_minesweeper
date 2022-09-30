@@ -10,9 +10,10 @@ class Board:
         self.board = self._create_board()
 
         self.mines_spot = set()
+        self.dug = set()
 
     def _create_board(self):
-        board = [[None for column in range(self.columns)] for row in range(self.rows)]
+        board = [[" " for _ in range(self.columns)] for _ in range(self.rows)]
         return board
 
     def plant_mines(self):
@@ -70,6 +71,35 @@ class Board:
         print('Board')
         for row in self.board:
             print(row)
+
+    def dig_spot(self, r, c):
+        # is valid input - TODO move to validators and implement as validator
+        if r not in range(self.rows+1) or c not in range(self.columns+1):
+            "Sorry we can't dig there... \n type 'x y' or 'x, y' "
+
+        # add spot to dug set.
+        self.dug.add((r, c))
+
+        # if its a boomb - false = gameover
+        if self.board[r][c] == '*':
+            return False
+
+        # if greater than 0 means near is a bomb - stop digging
+        elif self.board[r][c] > 0:
+            return True
+
+        # if not a bomb and not greater than 0
+        # check neighboring fields
+        row_range = range(max(0, r - 1), min(self.rows - 1, r + 1) + 1)
+        column_range = range(max(0, c - 1), min(self.columns - 1, c + 1) + 1)
+        for r in row_range:
+            for c in column_range:
+                if (r, c) in self.dug:
+                    continue # dont dig where you have done
+                self.dig_spot(r, c)
+
+        return True
+
 
 
 board = Board(10, 10, 10)
