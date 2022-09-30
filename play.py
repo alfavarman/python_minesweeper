@@ -13,7 +13,7 @@ class Board:
         self.dug = set()
 
     def _create_board(self):
-        board = [[None for _ in range(self.columns)] for _ in range(self.rows)]
+        board = [[0 for _ in range(self.columns)] for _ in range(self.rows)]
         return board
 
     def plant_mines(self):
@@ -73,10 +73,6 @@ class Board:
             print(row)
 
     def dig_spot(self, r, c):
-        # is valid input - TODO move to validators and implement as validator
-        if r not in range(self.rows+1) or c not in range(self.columns+1):
-            "Sorry we can't dig there... \n type 'x y' or 'x, y' "
-
         # add spot to dug set.
         self.dug.add((r, c))
 
@@ -112,29 +108,34 @@ class Board:
             print(row)
 
 
-
-board = Board(10, 10, 10)
-board.plant_mines()
-board.assign_nearbly_mines_count()
-board.show_board()
-print(board.player_board_view())
-
-
 def play(rows: int, columns: int, mines: int):
 
     board = Board(rows=rows, columns=columns, mines=mines)
     board.plant_mines()
     board.assign_nearbly_mines_count()
 
+
+    safe = True
     # while len(board.dug) is less than (board.rows *board.columns)-board.mines:
-    while len(board.dug) > (board.rows * board.columns)-board.mines:
+    while len(board.dug) < (board.rows * board.columns)-board.mines:
         print(board.player_board_view())
 
-    x, y = map(int, input(f'Where would You like to dig? input row, column as ex.: 2,3\n available rows: {rows}, columns {columns}'))
-# map input from player || loop until
-#     a) validate input to be correct
-#     b) check if input is a boom = game over
-#     c) check if its a number = display a number
-#     d) if its empty dig each next field until find a number
-#
-# repeat all until:
+        x, y = map(int, input(f'Where would You like to dig? input row, column as ex.: 2,3\n available rows: {rows}, columns {columns}').split())
+        if x not in range(rows + 1) or y not in range(columns + 1):
+            print("Sorry we can't dig there...")
+            continue
+
+        safe = board.dig_spot(x, y)
+        if not safe:
+            break
+
+    if safe:
+        print('Victorious! You removed all mines!')
+    else:
+        print('Baaaang! Gave Over')
+        print(board.show_board())
+
+
+if __name__ == '__main__': #run only this code
+    play(10, 10, 7)
+
